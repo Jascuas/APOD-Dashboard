@@ -26,7 +26,6 @@ function Dashboard() {
             try {
                 fetcher(url).then((data) => {
                     if (data) {
-                        console.log(data)
                         setDates(data)
                         setIsLoading(false)
                         setError(null);
