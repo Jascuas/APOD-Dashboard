@@ -17,21 +17,40 @@ function getUrl() {
 
 function Dashboard() {
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [dates, setDates] = useState(null);
 
     useEffect(() => {
         if (isLoading) {
             let url = getUrl()
-            fetcher(url).then((data) => {
-                setDates(data)
-                setIsLoading(false)
-            })
+            try {
+                fetcher(url).then((data) => {
+                    if (data) {
+                        console.log(data)
+                        setDates(data)
+                        setIsLoading(false)
+                        setError(null);
+                    } else {
+                        setError("There was an error getting the dates");
+                    }
+
+                })
+            } catch (error) {
+                setError("We couldn't make the request to get the dates");
+            }
         }
     }, [isLoading])
     if (isLoading) {
         return (
             <div className="App">
                 <h1>Cargando...</h1>
+            </div>
+        );
+    }
+    if (error) {
+        return (
+            <div className="App">
+                <h1>{error}</h1>
             </div>
         );
     }
@@ -43,7 +62,7 @@ function Dashboard() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-4">
                     {
                         dates.map(date => (
-                            <Link to={{ pathname: "/detailsDate", search: `?date=${date.date}` }}  key={date.date}>
+                            <Link to={{ pathname: "/detailsDate", search: `?date=${date.date}` }} key={date.date}>
                                 <DateCard date={date} />
                             </Link>
                         ))

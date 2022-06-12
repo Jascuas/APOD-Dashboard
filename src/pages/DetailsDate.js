@@ -18,16 +18,26 @@ function useQuery() {
 
 function DetailsDate() {
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [data, setData] = useState(null);
   const date = useQuery();
 
   useEffect(() => {
     if (isLoading) {
       let url = getUrl(date)
-      fetcher(url).then((data) => {
-        setData(data)
-        setIsLoading(false)
-      })
+      try {
+        fetcher(url).then((data) => {
+          if (data) {
+            setData(data)
+            setIsLoading(false)
+            setError(null);
+          } else {
+            setError("There was an error getting the date");
+          }
+        })
+      } catch (error) {
+        setError("We couldn't make the request to get the dates");
+      }
     }
   }, [isLoading, date])
   if (isLoading) {
@@ -37,13 +47,19 @@ function DetailsDate() {
       </div>
     );
   }
-
+  if (error) {
+    return (
+        <div className="App">
+            <h1>{error}</h1>
+        </div>
+    );
+  }
   return (
     <div className="app">
       <Navbar />
       <div>
         <div className="p-4 w-4/5 m-auto">
-          <Link to={{ pathname: "/"}}><h2 className="text-2xl py-2">← Volver al Dashboard</h2></Link>
+          <Link to={{ pathname: "/" }}><h2 className="text-2xl py-2">← Volver al Dashboard</h2></Link>
           <div className="rounded-lg shadow-lg bg-white w-full sm:w-4/5 lg:w-1/2 m-auto">
             <img className="rounded-t-lg w-full" src={data.url} alt={data.title} />
             <div className="p-6 ">
